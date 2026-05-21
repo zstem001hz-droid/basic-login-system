@@ -118,4 +118,10 @@ basic-login-system/
 
 ## Reflection
 
-> 🚧 Work in progress
+Building this lab surfaced a number of real-world challenges that go beyond the curriculum material.
+
+The first major hurdle was environment configuration. Getting `dotenv` to load correctly required `require("dotenv").config()` to be the very first line in `server.js` — before any other imports. A misplaced require statement caused `MONGO_URI` to return `undefined`, which produced a cryptic Mongoose error that had nothing to do with the connection string itself. Understanding the load order of Node.js modules was the real lesson here.
+
+The most instructive bug was in the Mongoose pre-save hook. The curriculum shows `next` as a parameter in the middleware function, but newer versions of Mongoose handle async middleware differently — `next` is not needed and calling it throws a `TypeError`. Removing it and allowing the async function to resolve naturally fixed the issue. This was a case where the curriculum and the actual library behavior diverged, requiring independent debugging.
+
+From an IAM perspective, several concepts in this lab map directly to enterprise security patterns. The JWT signing and verification flow mirrors SAML token assertions used in enterprise SSO — a signed, self-contained token that proves identity without requiring a session lookup. The bcrypt pre-save hook is conceptually similar to a one-way credential vault — you can verify against it but never retrieve the original value, which is the same principle behind privileged account password management in Privileged Access Management (PAM) platforms. The deliberate use of a generic error message for both wrong password and non-existent email directly mirrors account enumeration attack prevention — a standard control in any hardened authentication system.
