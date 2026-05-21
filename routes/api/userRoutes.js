@@ -14,4 +14,29 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// POST /api/users/login - Authenticate a user and return a token
+router.post("/login", async (req, res) => {
+  try {
+    // Find user by email
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(400).json({ message: "Incorrect email or password" });
+    }
+
+    // Verify password
+    const correcPw = await user.isCorrectPassword(req.body.password);
+
+    if (!correctPw) {
+      return res.status(400).json({ message: "Incorrect email or password." });
+    }
+
+    // Sign and return token
+    const token = signToken(user);
+    res.json({ token, user });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 module.exports = router;
