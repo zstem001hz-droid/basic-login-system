@@ -1,5 +1,13 @@
 # Basic Login System
 
+![Node.js](https://img.shields.io/badge/Node.js-20.x-green)
+![Express](https://img.shields.io/badge/Express-5.x-lightgrey)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange)
+![bcrypt](https://img.shields.io/badge/Security-bcrypt-red)
+
+A secure REST API implementing user registration and JWT-based authentication. Passwords are hashed and salted using bcrypt before storage — plain text credentials are never persisted to the database.
+
 ## Tech Stack
 - Node.js
 - Express
@@ -54,6 +62,31 @@ basic-login-system/
 |--------|----------|-------------|
 | POST | `/api/users/register` | Register a new user |
 | POST | `/api/users/login` | Login and receive JWT |
+
+## Authentication Flow
+
+1. Client sends credentials to `/api/users/register`
+2. Mongoose pre-save hook intercepts and hashes password using bcrypt with 10 salt rounds
+3. User document saved to MongoDB with hashed password — plain text never persisted
+4. On login, `bcrypt.compare()` validates incoming password against stored hash
+5. On success, server signs and returns a JWT containing non-sensitive user data
+6. Client includes JWT in `Authorization: Bearer <token>` header on subsequent requests
+
+## Security Features
+
+- Passwords hashed and salted using bcrypt with 10 salt rounds
+- JWT authentication issued on successful login
+- Generic error messages on failed login prevent email enumeration attacks
+- Environment variables protect sensitive credentials
+- `.env` excluded from version control via `.gitignore`
+- Cryptographically generated JWT secret using Node.js `crypto` module
+
+## Error Responses
+
+| Status Code | Message | Reason |
+|-------------|---------|--------|
+| 400 | Incorrect email or password. | Invalid login credentials |
+| 400 | Incorrect email or password. | Non-existent email — same message intentional |
 
 ## Usage Examples
 
